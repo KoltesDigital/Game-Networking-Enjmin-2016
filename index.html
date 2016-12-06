@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+		<title>Advanced Game Networking</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
 		<link rel="stylesheet" href="css/theme/black.css">
@@ -24,8 +24,365 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
+				<section>
+					<h1>Advanced Game Networking</h1>
+					<p>Wednesday, December 7, 2016</p>
+				</section>
+
+				<section>
+					<section>
+						<h2>About me</h2>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>First, some reminders</h2>
+					</section>
+
+					<section>
+						<h3>Latency / Bandwidth</h3>
+						<p class="fragment"><img src="media/IP-over-pigeons.gif"/></p>
+					</section>
+
+					<section>
+						<h3>Protocols</h3>
+						<p class="fragment">UDP</p>
+						<p class="fragment">TCP</p>
+						<p class="fragment">Most RT games: <em>Reliable</em> UDP</p>
+					</section>
+
+					<section>
+						<h3>It's about logical thinking</h3>
+						<p><img src="media/KnightsTemplarPlayingChess1283.jpg"/></p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>RT <em>strategy</em> games</h2>
+						<p><img src="media/enemy_protoss_encampment_on_kaldir-1024.jpg"/></p>
+					</section>
+
+					<section>
+						<h3>Requirements</h3>
+						<p class="fragment">Fairness</p>
+						<p class="fragment">Determinism</p>
+					</section>
+
+					<section>
+						<h3>Command Design Pattern</h3>
+						<p><img src="media/command-buttons-one.png"/></p>
+						<p>Without</p>
+					</section>
+
+					<section>
+						<h3>Command Design Pattern</h3>
+						<p><img src="media/command-buttons-two.png"/></p>
+						<p>With</p>
+					</section>
+
+					<section>
+						<h3>Undo Redo</h3>
+						<p><img src="media/Undo_img1.jpg"/></p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>RT <em>simulation</em> games</h2>
+						<p><img src="media/ACBmultiplayer.jpg"/></p>
+					</section>
+
+					<section>
+						<h3>Requirements</h3>
+						<p class="fragment">Fun</p>
+						<p class="fragment">Flow</p>
+						<p class="fragment">No frustration</p>
+					</section>
+
+					<section>
+						<h3>Client prediction</h3>
+						<p><img src="media/Lag_compensation.jpg"/></p>
+					</section>
+
+					<section>
+						<h3>Dead reckoning</h3>
+						<p><img src="media/Fig-1-A-typical-dead-reckoning-plot-for-a-boat-on-the-open-sea-The-closed-circles.png"/></p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Topologies</h2>
+					</section>
+
+					<section>
+						<h3>One Server - Many Clients</h3>
+						<p class="fragment">+ Central authority</p>
+						<p class="fragment">- Heavy load</p>
+					</section>
+
+					<section>
+						<h3>Peer to Peer</h3>
+						<p class="fragment">+ Distribute the load</p>
+						<p class="fragment">- More complex to synchronize</p>
+					</section>
+
+					<section>
+						<h3>A mix of both?</h3>
+						<p>For instance:</p>
+						<p>Host for gameplay events</p>
+						<p>P2P for chat</p>
+					</section>
+
+					<section>
+						<h3>Host migration</h3>
+						<p><img src="media/hostmigration.jpg"/></p>
+					</section>
+
+					<section>
+						<h3>A world without firewalls</h3>
+						<p><img src="media/p2p.png"/></p>
+					</section>
+
+					<section>
+						<h3>NAT</h3>
+						<p><img src="media/nat.png"/></p>
+					</section>
+
+					<section>
+						<h3>STUN</h3>
+						<p><img src="media/stun.png"/></p>
+					</section>
+
+					<section>
+						<h3>TURN</h3>
+						<p><img src="media/turn.png"/></p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Services</h2>
+						<p><em>"Around the game"</em></p>
+					</section>
+
+					<section>
+						<h3>Example: Profile</h3>
+						<p class="fragment">Requires a database</p>
+						<p class="fragment">Requires a profanity checker</p>
+					</section>
+
+					<section>
+						<h3>Example: Matchmaking</h3>
+						<p class="fragment">Requires a matching algorithm</p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Serialization</h2>
+						<p><em>Transforming objects to/from memory buffers</em></p>
+					</section>
+
+					<section>
+						<h3>Why?</h3>
+						<p class="fragment">Indirections (pointers)</p>
+						<p class="fragment">Endianness</p>
+						<p class="fragment">Optimisations, perhaps</p>
+					</section>
+
+					<section>
+						<h3>C++</h3>
+						<p>Lack of support (some RTTI though)</p>
+						<p>Usually: custom solutions</p>
+					</section>
+
+					<section>
+						<h3>C++: custom solution</h3>
+						<pre><code data-trim data-noescape>
+struct CharacterProfile
+{
+	string name;
+	int level;
+
+	void Serialize(Serializer &serializer);
+};
+						</code></pre>
+						<pre><code data-trim data-noescape>
+void CharacterProfile::Serialize(Serializer &serializer)
+{
+	serializer << name;
+	serializer << level;
+}
+						</code></pre>
+					</section>
+
+					<section>
+						<h3>C++: Unreal Engine 4</h3>
+						<pre><code data-trim data-noescape>
+UCLASS()
+class GAME_API UCharacterProfile : public UObject
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Switch Variables");
+	string name;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Switch Variables")
+	int level;
+};
+						</code></pre>
+						<p>Rely on the <em>Unreal Header Tool</em></p>
+					</section>
+
+					<section>
+						<h3>C#</h3>
+						<pre><code data-trim data-noescape>
+[Serializable]
+public class CharacterProfile
+{
+	public string name;
+	public int level;
+}
+						</code></pre>
+						<pre><code data-trim data-noescape>
+public void Load()
+{
+	CharacterProfile profile;
+	using (FileStream stream = File.OpenRead(filePath))
+	{
+	 	profile = formatter.Deserialize(stream) as CharacterProfile;
+	}
+}
+						</code></pre>
+					</section>
+
+					<section>
+						<h3>C#: Unity</h3>
+						<p>(When writing custom editors)</p>
+						<pre><code data-trim data-noescape>
+void OnEnable()
+{
+	name = serializedObject.FindProperty("name").stringValue;
+	level = serializedObject.FindProperty("level").intValue;
+}
+						</code></pre>
+					</section>
+
+					<section>
+						<h3>Binary format</h3>
+						<p><img src="media/flex001.png"/></p>
+					</section>
+
+					<section>
+						<h3>Semi-structured format</h3>
+						<p>Example: JSON</p>
+						<pre><code data-trim data-noescape>
+{
+	"characterProfile": {
+		"name": "John Doe"
+		"level": 42
+	}
+}
+						</code></pre>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Optimization</h2>
+					</section>
+
+					<section>
+						<h3>Am I looking in the right direction?</h3>
+						<p class="fragment">Architecture</p>
+						<p class="fragment">Modelisation</p>
+					</section>
+
+					<section>
+						<h3>Data packet optimization</h3>
+						<p>Example: sending a number (64 bits)</p>
+						<p class="fragment">Send the full value (64 bits)</p>
+						<p class="fragment">Add one bit to tell whether the value is zero (1 or 65 bits)</p>
+						<p class="fragment">Only send the less significant bits (from 6 to 70 bits)</p>
+					</section>
+
+					<section>
+						<h3>Gameplay</h3>
+						<p class="fragment">Do not wait the response</p>
+						<p class="fragment">Network camera</p>
+						<p class="fragment">P2P: better ownership distribution</p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Infrastructure</h2>
+					</section>
+
+					<section>
+						<h3>Scalability</h3>
+						<p class="fragment">Being able to spread the load</p>
+						<p class="fragment">No <em>Single Points of Failure</em></p>
+						<p class="fragment">Redundancy (load balancers, database clusters...)</p>
+					</section>
+
+					<section>
+						<h3>Instrumentation</h3>
+						<p class="fragment">Being able to scale</p>
+						<p class="fragment">Deployment</p>
+					</section>
+
+					<section>
+						<h3>Environments</h3>
+						<p class="fragment">Being able to deploy several versions</p>
+						<p class="fragment">Development, Tests, Production...</p>
+						<p class="fragment">How to switch?</p>
+					</section>
+
+					<section>
+						<h3>Logs</h3>
+						<p>Useful for debugging the servers...</p>
+					</section>
+
+					<section>
+						<h3>Metrics</h3>
+						<p><img src="media/kibana.png"/></p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Some last tips</h2>
+					</section>
+
+					<section>
+						<h3>Developing a networked game</h3>
+						<p class="fragment">Architecture</p>
+						<p class="fragment">Modelisation</p>
+						<p class="fragment">Asynchronous</p>
+						<p class="fragment">Logs &amp; metrics</p>
+					</section>
+
+					<section>
+						<h3>Working as an online programmer</h3>
+						<p class="fragment">Logical thinking</p>
+						<p class="fragment">Linux</p>
+						<p class="fragment">Web development</p>
+					</section>
+				</section>
+
+				<section>
+					<h2>Readings<h2>
+					<p><a href="http://gafferongames.com/networking-for-game-programmers/">Gaffer on Games | Game Networking</a></p>
+					<hr>
+					<p><a href="http://www.gamasutra.com/view/feature/131503/1500_archers_on_a_288_network_.php">1500 Archers on a 28.8: Network Programming in Age of Empires and Beyond</a></p>
+				</section>
+
+				<section>
+					<h2>Beer!<h2>
+				</section>
 			</div>
 		</div>
 
@@ -39,8 +396,8 @@
 
 				// More info https://github.com/hakimel/reveal.js#dependencies
 				dependencies: [
-					{ src: 'plugin/markdown/marked.js' },
-					{ src: 'plugin/markdown/markdown.js' },
+					// { src: 'plugin/markdown/marked.js' },
+					// { src: 'plugin/markdown/markdown.js' },
 					{ src: 'plugin/notes/notes.js', async: true },
 					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
 				]
