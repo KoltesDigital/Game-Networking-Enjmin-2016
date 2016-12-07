@@ -33,6 +33,51 @@
 					<section>
 						<h2>About me</h2>
 					</section>
+
+					<section>
+						<h3>From the Alps</h3>
+						<p><img src="media/DSC_0020-Panorama.jpg"/></p>
+					</section>
+
+					<section>
+						<h3>In winter</h3>
+						<p><img src="media/Vue des Saisies.jpg"/></p>
+					</section>
+
+					<section>
+						<h3>Lyon, France</h3>
+						<p><img src="media/Lyon_vue1.jpg"/></p>
+					</section>
+
+					<section>
+						<h3>Karlsruhe, Germany</h3>
+						<p><img src="media/Header_Schloss-Luftbild.jpg"/></p>
+					</section>
+
+					<section>
+						<h3>At Ubisoft</h3>
+						<p><img src="media/JD2016_KeyArt_GC_150805_10AM_CET_1438684614.jpg"/></p>
+					</section>
+
+					<section>
+						<h3>Fesses</h3>
+						<iframe width="560" height="315" src="https://www.youtube.com/embed/_KI1DQYXK6A" frameborder="0" allowfullscreen></iframe>
+					</section>
+
+					<section>
+						<h3>Big Boom Bada Boom</h3>
+						<iframe width="560" height="315" src="https://www.youtube.com/embed/gpTvKt7aSjQ" frameborder="0" allowfullscreen></iframe>
+					</section>
+
+					<section>
+						<h3>Final Countdown</h3>
+						<iframe width="560" height="315" src="https://www.youtube.com/embed/PmKrE9F3e8I" frameborder="0" allowfullscreen></iframe>
+					</section>
+				</section>
+
+				<section>
+					<h2>It's about logical thinking</h2>
+					<p><img src="media/KnightsTemplarPlayingChess1283.jpg"/></p>
 				</section>
 
 				<section>
@@ -50,11 +95,6 @@
 						<p class="fragment">UDP</p>
 						<p class="fragment">TCP</p>
 						<p class="fragment">Most RT games: <em>Reliable</em> UDP</p>
-					</section>
-
-					<section>
-						<h3>It's about logical thinking</h3>
-						<p><img src="media/KnightsTemplarPlayingChess1283.jpg"/></p>
 					</section>
 				</section>
 
@@ -169,14 +209,26 @@
 					</section>
 
 					<section>
-						<h3>Example: Profile</h3>
-						<p class="fragment">Requires a database</p>
-						<p class="fragment">Requires a profanity checker</p>
+						<h3>Local service: Discovery</h3>
 					</section>
 
 					<section>
-						<h3>Example: Matchmaking</h3>
+						<h3>Online services</h3>
+						<p class="fragment">No RT requirement</p>
+						<p class="fragment">TCP / HTTP are relevant</p>
+					</section>
+
+					<section>
+						<h3>Online service: Profile</h3>
+						<p class="fragment">Requires a database</p>
+						<p class="fragment">Requires a profanity checker</p>
+						<p class="fragment">Requires a storage space for the picture</p>
+					</section>
+
+					<section>
+						<h3>Online service: Matchmaking</h3>
 						<p class="fragment">Requires a matching algorithm</p>
+						<p class="fragment">Accesses the profiles</p>
 					</section>
 				</section>
 
@@ -207,11 +259,11 @@ struct CharacterProfile
 	string name;
 	int level;
 
-	void Serialize(Serializer &serializer);
+	void Serialize(Serializer &amp;serializer);
 };
 						</code></pre>
 						<pre><code data-trim data-noescape>
-void CharacterProfile::Serialize(Serializer &serializer)
+void CharacterProfile::Serialize(Serializer &amp;serializer)
 {
 	serializer << name;
 	serializer << level;
@@ -250,6 +302,8 @@ public class CharacterProfile
 public void Load()
 {
 	CharacterProfile profile;
+	BinaryFormatter formatter = new BinaryFormatter();
+
 	using (FileStream stream = File.OpenRead(filePath))
 	{
 	 	profile = formatter.Deserialize(stream) as CharacterProfile;
@@ -291,7 +345,64 @@ void OnEnable()
 
 				<section>
 					<section>
+						<h2>Physics simulation</h2>
+					</section>
+
+					<section>
+						<h3>Object ownership</h3>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Unit Tests</h2>
+					</section>
+
+					<section>
+						<h3>For gameplay</h3>
+						<pre><code data-trim data-noescape>
+VehicleUnit unit(position: (4, 7), speed: 10)
+game.Add(unit);
+
+MoveCommand cmd(target: (5, 2))
+game.Execute(cmd);
+EXPECT_EQ((4, 7), unit.position);
+
+game.Update(1.0f);
+EXPECT_EQ((5, 2), unit.position)
+						</code></pre>
+					</section>
+
+					<section>
+						<h3>For services</h3>
+						<pre><code data-trim data-noescape>
+get('/profile/johndoe')
+  .expect(404);
+post('/profile/', ...)
+  .expect(201);
+get('/profile/johndoe')
+  .expect(200);
+put('/profile/johndoe', ...)
+  .expect(204);
+get('/profile/johndoe')
+  .expect(200);
+delete('/profile/johndoe')
+  .expect(204);
+get('/profile/johndoe')
+  .expect(404);
+						</code></pre>
+					</section>
+				</section>
+
+				<section>
+					<section>
 						<h2>Optimization</h2>
+					</section>
+
+					<section>
+						<h3>Jackson's rules of program optimization</h3>
+						<p class="fragment">Rule #1: Don't do it</p>
+						<p class="fragment">Rule #2 (for experts only): Don't do it yet</p>
 					</section>
 
 					<section>
@@ -310,7 +421,7 @@ void OnEnable()
 
 					<section>
 						<h3>Gameplay</h3>
-						<p class="fragment">Do not wait the response</p>
+						<p class="fragment">Do not wait for the response</p>
 						<p class="fragment">Network camera</p>
 						<p class="fragment">P2P: better ownership distribution</p>
 					</section>
@@ -323,20 +434,20 @@ void OnEnable()
 
 					<section>
 						<h3>Scalability</h3>
-						<p class="fragment">Being able to spread the load</p>
+						<p>Being able to spread the load</p>
 						<p class="fragment">No <em>Single Points of Failure</em></p>
 						<p class="fragment">Redundancy (load balancers, database clusters...)</p>
 					</section>
 
 					<section>
 						<h3>Instrumentation</h3>
-						<p class="fragment">Being able to scale</p>
+						<p>Being able to scale</p>
 						<p class="fragment">Deployment</p>
 					</section>
 
 					<section>
 						<h3>Environments</h3>
-						<p class="fragment">Being able to deploy several versions</p>
+						<p>Being able to deploy several versions</p>
 						<p class="fragment">Development, Tests, Production...</p>
 						<p class="fragment">How to switch?</p>
 					</section>
@@ -349,6 +460,22 @@ void OnEnable()
 					<section>
 						<h3>Metrics</h3>
 						<p><img src="media/kibana.png"/></p>
+					</section>
+
+					<section>
+						<h3>Monitoring</h3>
+						<p>From metrics to alerts</p>
+					</section>
+
+					<section>
+						<h3>Back-Office</h3>
+					</section>
+
+					<section>
+						<h3>Security</h3>
+						<p>Firewall</p>
+						<p>HTTPS</p>
+						<p>Authentication token</p>
 					</section>
 				</section>
 
